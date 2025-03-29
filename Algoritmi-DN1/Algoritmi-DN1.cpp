@@ -4,6 +4,7 @@
 #include <fstream>
 
 #define OUTPUT_FILE "out.txt"
+#define CHECK_ORDER true
 
 std::vector<int> readData(std::string fileName)
 {
@@ -78,6 +79,14 @@ void romanSort(std::vector<int>& A)
 	A = B;
 }
 
+bool checkOrder(const std::vector<int>& data)
+{
+	for (int i = 1; i < data.size(); i++)
+		if (data[i] < data[i - 1])
+			return false;
+	return true;
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc != 3)
@@ -121,6 +130,15 @@ int main(int argc, char* argv[])
 		countingSort(data);
 
 	writeData(data);
+
+	if (CHECK_ORDER)
+	{
+		bool sorted = checkOrder(data);
+		if (sorted)
+			std::cout << "Podatki uspesno sortirani!\n";
+		else
+			std::cerr << "Napaka pri sortiranju podatkov!\n";
+	}
 
 	return 0;
 }
