@@ -34,6 +34,35 @@ void writeData(std::vector<int>& data)
 	file.close();
 }
 
+void getMinMax(const std::vector<int>& data, int& min, int& max)
+{
+	min = data[0];
+	max = data[0];
+	for (int i = 1; i < data.size(); i++)
+	{
+		if (data[i] < min)
+			min = data[i];
+		if (data[i] > max)
+			max = data[i];
+	}
+}
+
+void countingSort(std::vector<int>& A)
+{
+	int min, max;
+	getMinMax(A, min, max);
+	std::vector<int> C(max - min + 1, 0);
+	for (int i = 0; i < A.size(); i++)
+		C[A[i] - min]++;
+	for (int i = 1; i < C.size(); i++)
+		C[i] += C[i - 1];
+	std::vector<int> B(A.size());
+	for (int i = A.size() - 1; i >= 0; i--)
+		B[C[A[i] - min] - 1] = A[i],
+		C[A[i] - min]--;
+	A = B;
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc != 3)
