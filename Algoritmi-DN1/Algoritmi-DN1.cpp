@@ -3,6 +3,8 @@
 #include <vector>
 #include <fstream>
 
+#define OUTPUT_FILE "out.txt"
+
 std::vector<int> readData(std::string fileName)
 {
 	std::vector<int> data;
@@ -17,6 +19,19 @@ std::vector<int> readData(std::string fileName)
 		data.push_back(temp);
 	file.close();
 	return data;
+}
+
+void writeData(std::vector<int>& data)
+{
+	std::ofstream file(OUTPUT_FILE);
+	if (!file.is_open())
+	{
+		std::cerr << "Napaka pri odpiranju datoteke!\n";
+		return;
+	}
+	for (int i = 0; i < data.size(); i++)
+		file << data[i] << " ";
+	file.close();
 }
 
 int main(int argc, char* argv[])
@@ -49,6 +64,15 @@ int main(int argc, char* argv[])
 		std::cerr << "Nepravilna uporaba argumentov!\nUporaba: " << argv[0] << " <tip_sortiranja> <ime_datoteke>\n\t-tip_sortiranja: 0 = Counting sort, 1 = Roman sort\n\t-ime_datoteke: ime tekstovne datoteke s podatki, npr. vhod.txt\n";
 		return 1;
 	}
+
+	std::vector<int> data = readData(fileName);
+	if (data.size() == 0)
+	{
+		std::cerr << "Napaka pri branju podatkov!\n";
+		return 1;
+	}
+
+	writeData(data);
 
 	return 0;
 }
