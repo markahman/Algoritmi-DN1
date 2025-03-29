@@ -63,6 +63,21 @@ void countingSort(std::vector<int>& A)
 	A = B;
 }
 
+void romanSort(std::vector<int>& A)
+{
+	int min, max;
+	getMinMax(A, min, max);
+	std::vector<int> C(max - min + 1, 0);
+	for (int i = 0; i < A.size(); i++)
+		C[A[i] - min]++;
+	std::vector<int> B(A.size());
+	int index = 0;
+	for (int i = 0; i < C.size(); i++)
+		for (int j = 0; j < C[i]; j++)
+			B[index++] = i + min;
+	A = B;
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc != 3)
@@ -100,6 +115,10 @@ int main(int argc, char* argv[])
 		std::cerr << "Napaka pri branju podatkov!\n";
 		return 1;
 	}
+	if (useRomanSort)
+		romanSort(data);
+	else
+		countingSort(data);
 
 	writeData(data);
 
