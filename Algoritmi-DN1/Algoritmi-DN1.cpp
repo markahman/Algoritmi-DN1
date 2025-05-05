@@ -6,9 +6,11 @@
 #define OUTPUT_FILE "out.txt"
 #define CHECK_ORDER true
 
-std::vector<int> readData(std::string fileName)
+typedef unsigned char byte;
+
+std::vector<byte> readData(std::string fileName)
 {
-	std::vector<int> data;
+	std::vector<byte> data;
 	std::ifstream file(fileName);
 	if (!file.is_open())
 	{
@@ -22,7 +24,7 @@ std::vector<int> readData(std::string fileName)
 	return data;
 }
 
-void writeData(std::vector<int>& data)
+void writeData(std::vector<byte>& data)
 {
 	std::ofstream file(OUTPUT_FILE);
 	if (!file.is_open())
@@ -31,55 +33,11 @@ void writeData(std::vector<int>& data)
 		return;
 	}
 	for (int i = 0; i < data.size(); i++)
-		file << data[i] << " ";
+		file << int(data[i]) << " ";
 	file.close();
 }
 
-void getMinMax(const std::vector<int>& data, int& min, int& max)
-{
-	min = data[0];
-	max = data[0];
-	for (int i = 1; i < data.size(); i++)
-	{
-		if (data[i] < min)
-			min = data[i];
-		if (data[i] > max)
-			max = data[i];
-	}
-}
-
-void countingSort(std::vector<int>& A)
-{
-	int min, max;
-	getMinMax(A, min, max);
-	std::vector<int> C(max - min + 1, 0);
-	for (int i = 0; i < A.size(); i++)
-		C[A[i] - min]++;
-	for (int i = 1; i < C.size(); i++)
-		C[i] += C[i - 1];
-	std::vector<int> B(A.size());
-	for (int i = A.size() - 1; i >= 0; i--)
-		B[C[A[i] - min] - 1] = A[i],
-		C[A[i] - min]--;
-	A = B;
-}
-
-void romanSort(std::vector<int>& A)
-{
-	int min, max;
-	getMinMax(A, min, max);
-	std::vector<int> C(max - min + 1, 0);
-	for (int i = 0; i < A.size(); i++)
-		C[A[i] - min]++;
-	std::vector<int> B(A.size());
-	int index = 0;
-	for (int i = 0; i < C.size(); i++)
-		for (int j = 0; j < C[i]; j++)
-			B[index++] = i + min;
-	A = B;
-}
-
-bool checkOrder(const std::vector<int>& data)
+bool checkOrder(const std::vector<byte>& data)
 {
 	for (int i = 1; i < data.size(); i++)
 		if (data[i] < data[i - 1])
@@ -87,54 +45,65 @@ bool checkOrder(const std::vector<int>& data)
 	return true;
 }
 
+void sortByBit(std::vector<byte>& A, const std::vector<bool>& D)
+{
+	std::vector<byte> B(A.size());	// Zacasni vektor
+	int j = 0;
+	for (int i = 0; i < A.size(); i++)	// Prvo kopiramo elemente, ki imajo na tem mestu bit 0
+		if (!D[i])
+			B[j++] = A[i];
+	for (int i = 0; i < A.size(); i++)	// Nato pa elemente, ki imajo na tem mestu bit 1
+		if (D[i])
+			B[j++] = A[i];
+	A = B;
+}
+
+void binaryRadixSort(std::vector<byte>& A)
+{
+	for (int k = 0; k < 8; k++)
+	{
+		std::vector<bool> D(A.size());	// Vektor, ki hrani vrednosti bitov na mestu k
+		for (int i = 0; i < A.size(); i++)
+			D[i] = (A[i] >> k) & 1;
+		sortByBit(A, D);	// Sortiramo A glede na bit k
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc != 3)
 	{
-		std::cerr << "Nepravilno stevilo argumentov!\nUporaba: " << argv[0] << " <tip_sortiranja> <ime_datoteke>\n\t-tip_sortiranja: 0 = Counting sort, 1 = Roman sort\n\t-ime_datoteke: ime tekstovne datoteke s podatki, npr. vhod.txt\n";
-		return 1;
-	}
-	std::string a1 = argv[1];
-	std::string a2 = argv[2];
-	bool useRomanSort;
-	std::string fileName;
-	try
-	{
-		if (a1 == "0")
-			useRomanSort = false;
-		else if (a1 == "1")
-			useRomanSort = true;
-		else
-			throw std::exception();
-
-		if (a2.substr(a2.size() - 4) == ".txt")
-			fileName = a2;
-		else
-			throw std::exception();
-	}
-	catch (std::exception e)
-	{
-		std::cerr << "Nepravilna uporaba argumentov!\nUporaba: " << argv[0] << " <tip_sortiranja> <ime_datoteke>\n\t-tip_sortiranja: 0 = Counting sort, 1 = Roman sort\n\t-ime_datoteke: ime tekstovne datoteke s podatki, npr. vhod.txt\n";
+		std::cerr << "Uporaba: " << argv[0] << " <input_file> <smer_sortiranja>\n\t<smer_sortiranja> - asc = narascajoce, desc = padajoce\n";
 		return 1;
 	}
 
-	std::vector<int> data = readData(fileName);
-	if (data.size() == 0)
+	std::string fileName = argv[1];
+	std::vector<byte> data = readData(fileName);
+	if (data.empty())
 	{
 		std::cerr << "Napaka pri branju podatkov!\n";
 		return 1;
 	}
-	if (useRomanSort)
-		romanSort(data);
+
+	bool ascending = true;
+	std::string orderStr = argv[2];
+	if (orderStr == "asc")
+		ascending = true;
+	else if (orderStr == "desc")
+		ascending = false;
 	else
-		countingSort(data);
+	{
+		std::cerr << "Napaka pri vnosu smeri sortiranja!\n";
+		std::cerr << "Uporaba: " << argv[0] << " <input_file> <smer_sortiranja>\n\t<smer_sortiranja> - asc = narascajoce, desc = padajoce";
+		return 1;
+	}
+
+	binaryRadixSort(data);
 
 	writeData(data);
-
 	if (CHECK_ORDER)
 	{
-		bool sorted = checkOrder(data);
-		if (sorted)
+		if (checkOrder(data))
 			std::cout << "Podatki uspesno sortirani!\n";
 		else
 			std::cerr << "Napaka pri sortiranju podatkov!\n";
