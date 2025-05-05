@@ -58,7 +58,7 @@ void sortByBit(std::vector<byte>& A, const std::vector<bool>& D)
 	A = B;
 }
 
-void binaryRadixSort(std::vector<byte>& A)
+void binaryRadixSort(std::vector<byte>& A, bool sortOrder)
 {
 	for (int k = 0; k < 8; k++)
 	{
