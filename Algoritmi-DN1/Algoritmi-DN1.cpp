@@ -55,10 +55,20 @@ void sortByBit(std::vector<byte>& A, const std::vector<bool>& D, const bool sort
 			if (!D[i])
 				B[j++] = A[i];
 		}
+		else
+		{
+			if (D[i])
+				B[j++] = A[i];
+		}
 	for (int i = 0; i < A.size(); i++)	// Drugi prehod
 		if (sortOrder)
 		{
 			if (D[i])
+				B[j++] = A[i];
+		}
+		else
+		{
+			if (!D[i])
 				B[j++] = A[i];
 		}
 	A = B;
