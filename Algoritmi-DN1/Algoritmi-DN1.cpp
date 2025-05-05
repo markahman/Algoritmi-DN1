@@ -85,12 +85,12 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	bool ascending = true;
+	bool sortOrder;
 	std::string orderStr = argv[2];
 	if (orderStr == "asc")
-		ascending = true;
+		sortOrder = true;
 	else if (orderStr == "desc")
-		ascending = false;
+		sortOrder = false;
 	else
 	{
 		std::cerr << "Napaka pri vnosu smeri sortiranja!\n";
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	binaryRadixSort(data);
+	binaryRadixSort(data, sortOrder);
 
 	writeData(data);
 	if (CHECK_ORDER)
