@@ -49,12 +49,18 @@ void sortByBit(std::vector<byte>& A, const std::vector<bool>& D, const bool sort
 {
 	std::vector<byte> B(A.size());	// Zacasni vektor
 	int j = 0;
-	for (int i = 0; i < A.size(); i++)	// Prvo kopiramo elemente, ki imajo na tem mestu bit 0
-		if (!D[i])
-			B[j++] = A[i];
-	for (int i = 0; i < A.size(); i++)	// Nato pa elemente, ki imajo na tem mestu bit 1
-		if (D[i])
-			B[j++] = A[i];
+	for (int i = 0; i < A.size(); i++)	// Prvi prehod
+		if (sortOrder)
+		{
+			if (!D[i])
+				B[j++] = A[i];
+		}
+	for (int i = 0; i < A.size(); i++)	// Drugi prehod
+		if (sortOrder)
+		{
+			if (D[i])
+				B[j++] = A[i];
+		}
 	A = B;
 }
 
