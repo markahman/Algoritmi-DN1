@@ -37,7 +37,7 @@ void writeData(std::vector<byte>& data)
 	file.close();
 }
 
-bool checkOrder(const std::vector<byte>& data)
+bool checkOrder(const std::vector<byte>& data, const bool sortOrder)
 {
 	for (int i = 1; i < data.size(); i++)
 		if (data[i] < data[i - 1])
@@ -45,27 +45,43 @@ bool checkOrder(const std::vector<byte>& data)
 	return true;
 }
 
-void sortByBit(std::vector<byte>& A, const std::vector<bool>& D)
+void sortByBit(std::vector<byte>& A, const std::vector<bool>& D, const bool sortOrder)
 {
 	std::vector<byte> B(A.size());	// Zacasni vektor
 	int j = 0;
-	for (int i = 0; i < A.size(); i++)	// Prvo kopiramo elemente, ki imajo na tem mestu bit 0
-		if (!D[i])
-			B[j++] = A[i];
-	for (int i = 0; i < A.size(); i++)	// Nato pa elemente, ki imajo na tem mestu bit 1
-		if (D[i])
-			B[j++] = A[i];
+	for (int i = 0; i < A.size(); i++)	// Prvi prehod
+		if (sortOrder)
+		{
+			if (!D[i])
+				B[j++] = A[i];
+		}
+		else
+		{
+			if (D[i])
+				B[j++] = A[i];
+		}
+	for (int i = 0; i < A.size(); i++)	// Drugi prehod
+		if (sortOrder)
+		{
+			if (D[i])
+				B[j++] = A[i];
+		}
+		else
+		{
+			if (!D[i])
+				B[j++] = A[i];
+		}
 	A = B;
 }
 
-void binaryRadixSort(std::vector<byte>& A)
+void binaryRadixSort(std::vector<byte>& A, const bool sortOrder)
 {
 	for (int k = 0; k < 8; k++)
 	{
 		std::vector<bool> D(A.size());	// Vektor, ki hrani vrednosti bitov na mestu k
 		for (int i = 0; i < A.size(); i++)
 			D[i] = (A[i] >> k) & 1;
-		sortByBit(A, D);	// Sortiramo A glede na bit k
+		sortByBit(A, D, sortOrder);	// Sortiramo A glede na bit k
 	}
 }
 
